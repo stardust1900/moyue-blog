@@ -1,0 +1,24 @@
+---
+import { getTags } from '../../utils/posts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagCloud from '../../components/TagCloud.astro';
+import Icon from '../../components/Icon.astro';
+
+const tags = await getTags();
+---
+
+<BaseLayout title="标签" description="所有文章标签，点击标签查看相关文章">
+  <div class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-12">
+      <div class="flex items-center gap-3 mb-2">
+        <Icon name="tag" size={28} class="text-primary" />
+        <h1 class="text-3xl font-bold">标签</h1>
+      </div>
+      <p class="text-muted-foreground">所有文章标签，点击标签查看相关文章</p>
+    </div>
+  </div>
+
+  <section class="container mx-auto px-4 py-12">
+    <TagCloud tags={tags} />
+  </section>
+</BaseLayout>

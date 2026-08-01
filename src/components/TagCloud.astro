@@ -1,0 +1,32 @@
+---
+import { withBase } from '../utils/url';
+
+interface Props {
+  tags: { name: string; count: number }[];
+}
+const { tags } = Astro.props;
+const maxCount = Math.max(...tags.map((t) => t.count), 1);
+const sizeClass = (count: number) => {
+  const ratio = count / maxCount;
+  if (ratio > 0.7) return 'text-xl';
+  if (ratio > 0.4) return 'text-lg';
+  return 'text-base';
+};
+---
+
+<div class="flex flex-wrap gap-3 justify-center max-w-3xl mx-auto">
+  {
+    tags.map((tag) => (
+      <a
+        href={withBase('/tags/' + encodeURIComponent(tag.name) + '/')}
+        class:list={[
+          'inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card hover:border-primary hover:text-primary transition-all',
+          sizeClass(tag.count),
+        ]}
+      >
+        <span class="font-medium">{tag.name}</span>
+        <span class="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{tag.count}</span>
+      </a>
+    ))
+  }
+</div>

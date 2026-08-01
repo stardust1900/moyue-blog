@@ -1,0 +1,134 @@
+---
+import { getSortedPosts, getCategories, estimateReadingTime } from '../utils/posts';
+import { SITE, skills, readingList, SOCIAL } from '../consts';
+import { withBase } from '../utils/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+
+const posts = await getSortedPosts();
+const categories = await getCategories();
+const totalMinutes = posts.reduce((sum, p) => sum + estimateReadingTime(p.body), 0);
+---
+
+<BaseLayout title="关于" description={`关于 ${SITE.title}：${SITE.description}`}>
+  <!-- Hero -->
+  <section class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-16 md:py-20">
+      <div class="max-w-3xl mx-auto text-center space-y-6">
+        <div class="flex justify-center">
+          <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-5xl shadow-lg">📚</div>
+        </div>
+        <h1 class="text-4xl font-bold">关于{SITE.title}</h1>
+        <p class="text-lg text-muted-foreground leading-relaxed">
+          一个热爱阅读和编程的开发者。相信好的代码和好的文字一样，<br />都需要深思熟虑、精雕细琢。这里是我记录思考和分享知识的地方。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro -->
+  <section class="container mx-auto px-4 py-16">
+    <div class="max-w-3xl mx-auto space-y-8">
+      <div>
+        <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
+          <Icon name="book-open" size={24} class="text-primary" /> 我的阅读哲学
+        </h2>
+        <div class="prose-blog space-y-4 text-muted-foreground leading-relaxed">
+          <p>阅读是我认识世界的方式。每一本好书都是与一位智者的对话，它们拓展了我的认知边界，也改变了我看待问题的角度。</p>
+          <p>我尤其喜欢读技术书籍和思维类书籍。技术书籍让我保持专业上的精进，思维类书籍则帮助我在更宏观的层面理解世界。</p>
+          <blockquote>“我们阅读，是为了知道自己并不孤独。” —— C.S. 路易斯</blockquote>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
+          <Icon name="code" size={24} class="text-primary" /> 技术栈
+        </h2>
+        <div class="space-y-4">
+          {skills.map((skill) => (
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium">{skill.name}</span>
+                <span class="text-xs text-muted-foreground">{skill.level}%</span>
+              </div>
+              <div class="h-2 rounded-full bg-muted overflow-hidden">
+                <div class="h-full rounded-full bg-primary" style={`width:${skill.level}%`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reading List -->
+  <section class="bg-muted/20 border-y border-border">
+    <div class="container mx-auto px-4 py-16">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold flex items-center gap-2 mb-8">
+          <Icon name="coffee" size={24} class="text-primary" /> 阅读清单
+        </h2>
+        <div class="space-y-3">
+          {readingList.map((book) => (
+            <div class="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
+              <div class="text-3xl">{book.emoji}</div>
+              <div class="flex-1">
+                <h3 class="font-medium">{book.title}</h3>
+                <p class="text-sm text-muted-foreground">{book.author}</p>
+              </div>
+              <span class:list={[
+                'px-3 py-1 rounded-full text-xs font-medium',
+                book.status === '已读' ? 'bg-success/10 text-success' :
+                book.status === '阅读中' ? 'bg-warning/10 text-warning' :
+                'bg-muted text-muted-foreground',
+              ]}>{book.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="container mx-auto px-4 py-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold mb-8 text-center">博客数据</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="text-center p-6 rounded-2xl border border-border bg-card">
+          <div class="text-3xl font-bold text-primary">{posts.length}</div>
+          <div class="text-sm text-muted-foreground mt-1">篇文章</div>
+        </div>
+        <div class="text-center p-6 rounded-2xl border border-border bg-card">
+          <div class="text-3xl font-bold text-primary">{categories.length}</div>
+          <div class="text-sm text-muted-foreground mt-1">个分类</div>
+        </div>
+        <div class="text-center p-6 rounded-2xl border border-border bg-card">
+          <div class="text-3xl font-bold text-primary">{totalMinutes}</div>
+          <div class="text-sm text-muted-foreground mt-1">分钟阅读</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="border-t border-border bg-muted/20">
+    <div class="container mx-auto px-4 py-16">
+      <div class="max-w-2xl mx-auto text-center space-y-6">
+        <h2 class="text-2xl font-bold">联系我</h2>
+        <p class="text-muted-foreground">如果你有任何想法、建议或问题，欢迎与我交流。</p>
+        <div class="flex items-center justify-center gap-4">
+          <a href={SOCIAL.github} class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-card hover:border-primary hover:text-primary transition-colors" target="_blank" rel="noopener">
+            <Icon name="github" size={16} /> <span class="text-sm font-medium">GitHub</span>
+          </a>
+          <a href={SOCIAL.email} class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-card hover:border-primary hover:text-primary transition-colors">
+            <Icon name="mail" size={16} /> <span class="text-sm font-medium">Email</span>
+          </a>
+        </div>
+        <div class="flex items-center justify-center gap-1.5 text-sm text-muted-foreground pt-4">
+          Made with <Icon name="heart" size={16} class="text-destructive" /> &amp; code
+        </div>
+        <a href={withBase('/')} class="inline-block text-sm text-primary hover:underline">← 返回首页浏览文章</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

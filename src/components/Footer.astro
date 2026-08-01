@@ -1,0 +1,59 @@
+---
+import { SITE, NAV, SOCIAL } from '../consts';
+import { withBase } from '../utils/url';
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border bg-muted/30 mt-20">
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+            <Icon name="book-open" size={16} />
+          </div>
+          <span class="font-bold">{SITE.title}</span>
+        </div>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          一个关于读书与技术分享的个人博客。<br />
+          记录阅读的思考，分享编程的实践。
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-sm font-semibold">导航</h3>
+        <ul class="space-y-2 text-sm">
+          {
+            NAV.map((item) => (
+              <li>
+                <a href={withBase(item.path)} class="text-muted-foreground hover:text-foreground transition-colors">
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-sm font-semibold">关注</h3>
+        <div class="flex items-center gap-3">
+          <a href={SOCIAL.github} class="flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:bg-muted transition-colors" aria-label="GitHub" target="_blank" rel="noopener">
+            <Icon name="github" size={16} />
+          </a>
+          <a href={withBase('/rss.xml')} class="flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:bg-muted transition-colors" aria-label="RSS">
+            <Icon name="rss" size={16} />
+          </a>
+          <a href={SOCIAL.email} class="flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:bg-muted transition-colors" aria-label="Email">
+            <Icon name="mail" size={16} />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-border text-center text-xs text-muted-foreground">
+      © {year} {SITE.title} · Built with Astro &amp; passion for reading and code
+    </div>
+  </div>
+</footer>

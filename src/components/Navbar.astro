@@ -1,0 +1,82 @@
+---
+import { NAV, SITE } from '../consts';
+import { withBase } from '../utils/url';
+import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+const pathname = Astro.url.pathname;
+const isActive = (path: string) =>
+  path === '/' ? pathname === withBase('/') || pathname === '/' : pathname.startsWith(withBase(path));
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-md border-b border-border"
+>
+  <nav class="container mx-auto flex items-center justify-between h-16 px-4">
+    <a href={withBase('/')} class="flex items-center gap-2 group">
+      <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-110">
+        <Icon name="book-open" size={18} />
+      </div>
+      <span class="font-bold text-lg tracking-tight">{SITE.title}</span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-1">
+      {
+        NAV.map((item) => (
+          <a
+            href={withBase(item.path)}
+            class:list={[
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              isActive(item.path)
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <ThemeToggle />
+    </div>
+
+    <div class="flex items-center gap-1 md:hidden">
+      <ThemeToggle />
+      <button id="mobile-toggle" class="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="菜单">
+        <Icon name="menu" size={20} />
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" class="md:hidden hidden border-t border-border bg-background">
+    <div class="container mx-auto flex flex-col py-2 px-4">
+      {
+        NAV.map((item) => (
+          <a
+            href={withBase(item.path)}
+            class:list={[
+              'px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+              isActive(item.path)
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('mobile-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+  // 点击导航后收起移动菜单
+  menu?.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => menu.classList.add('hidden'))
+  );
+</script>

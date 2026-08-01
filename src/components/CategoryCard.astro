@@ -1,0 +1,24 @@
+---
+import type { CategoryInfo } from '../utils/posts';
+import { withBase } from '../utils/url';
+
+interface Props {
+  category: CategoryInfo;
+}
+const { category } = Astro.props;
+const href = withBase('/categories/' + category.slug + '/');
+---
+
+<a
+  href={href}
+  class="block p-6 rounded-2xl border border-border bg-card hover:border-primary hover:shadow-lg transition-all group"
+>
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-3xl group-hover:scale-110 transition-transform">
+      {category.icon}
+    </div>
+    <span class="text-2xl font-bold text-muted-foreground/30">{category.count}</span>
+  </div>
+  <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{category.name}</h3>
+  <p class="text-sm text-muted-foreground leading-relaxed">{category.description}</p>
+</a>

@@ -1,0 +1,21 @@
+{
+  "name": "moyue-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "墨阅 — 一个关于读书与技术的静态博客（Astro 重写，类 Jekyll）",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.11",
+    "astro": "^5.13.0",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/vite": "^4.1.0"
+  }
+}

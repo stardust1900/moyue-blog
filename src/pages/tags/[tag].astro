@@ -1,0 +1,41 @@
+---
+import { getTags, getPostsByTag } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Icon from '../../components/Icon.astro';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map((tag) => ({
+    params: { tag: tag.name },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = await getPostsByTag(tag.name);
+---
+
+<BaseLayout title={`标签：${tag.name}`} description={`标签「${tag.name}」下的 ${posts.length} 篇文章`}>
+  <div class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-12">
+      <a href={withBase('/tags')} class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+        <Icon name="arrow-left" size={16} /> 全部标签
+      </a>
+      <div class="flex items-center gap-3">
+        <Icon name="tag" size={28} class="text-primary" />
+        <h1 class="text-3xl font-bold">标签：<span class="text-primary">{tag.name}</span></h1>
+      </div>
+      <p class="text-muted-foreground mt-2">{posts.length} 篇文章</p>
+    </div>
+  </div>
+
+  <section class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map((post) => (
+        <ArticleCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

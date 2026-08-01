@@ -1,0 +1,33 @@
+---
+// Giscus 评论（基于 GitHub Discussions 的静态评论系统）
+// 在 src/consts.ts 中填入你自己的仓库信息后自动启用；未配置时显示占位提示。
+import { giscus } from '../consts';
+const enabled = !giscus.repo.includes('YOUR_');
+---
+
+{
+  enabled ? (
+    <div id="giscus-container" class="mt-12 pt-8 border-t border-border">
+      <script
+        src="https://giscus.app/client.js"
+        data-repo={giscus.repo}
+        data-repo-id={giscus.repoId}
+        data-category={giscus.category}
+        data-category-id={giscus.categoryId}
+        data-mapping={giscus.mapping}
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang={giscus.lang}
+        crossorigin="anonymous"
+        async
+      />
+    </div>
+  ) : (
+    <div class="mt-12 pt-8 border-t border-border text-sm text-muted-foreground">
+      评论区待启用：请在 <code>src/consts.ts</code> 的 <code>giscus</code> 中填入你的 GitHub 仓库信息（详见 README）。
+    </div>
+  )
+}

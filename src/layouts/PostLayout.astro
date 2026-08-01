@@ -1,0 +1,97 @@
+---
+import type { Post } from '../utils/posts';
+import { postSlug, estimateReadingTime } from '../utils/posts';
+import { withBase } from '../utils/url';
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Icon from '../components/Icon.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import Giscus from '../components/Giscus.astro';
+
+interface Props {
+  post: Post;
+  headings: { depth: number; slug: string; text: string }[];
+  related: Post[];
+}
+const { post, headings, related } = Astro.props;
+const { title, category, tags, date, description, coverEmoji } = post.data;
+const readingTime = estimateReadingTime(post.body);
+---
+
+<BaseLayout title={title} description={description}>
+  <!-- Hero -->
+  <div class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-12 md:py-16">
+      <div class="max-w-3xl mx-auto">
+        <a href={withBase('/')} class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+          <Icon name="arrow-left" size={16} /> 返回首页
+        </a>
+        <div class="flex items-center gap-3 text-sm mb-4">
+          <span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">{category}</span>
+          <span class="flex items-center gap-1 text-muted-foreground">
+            <Icon name="calendar" size={14} /> <FormattedDate date={date} />
+          </span>
+          <span class="flex items-center gap-1 text-muted-foreground">
+            <Icon name="clock" size={14} /> {readingTime} 分钟阅读
+          </span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-4">{title}</h1>
+        <p class="text-lg text-muted-foreground leading-relaxed mb-6">{description}</p>
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <a href={withBase('/tags/' + encodeURIComponent(tag) + '/')} class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-primary hover:text-primary-foreground transition-colors">
+              <Icon name="tag" size={12} /> {tag}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content + TOC -->
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-12 max-w-5xl mx-auto">
+      <div class="min-w-0">
+        <div class="text-5xl mb-8 text-center">{coverEmoji}</div>
+        <article class="prose-blog">
+          <slot />
+        </article>
+
+        <div class="mt-12 pt-8 border-t border-border flex items-center justify-between">
+          <a href={withBase('/')} class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Icon name="arrow-left" size={16} /> 返回首页
+          </a>
+          <a href="#top" class="text-sm text-muted-foreground hover:text-foreground transition-colors">回到顶部 ↑</a>
+        </div>
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <TableOfContents headings={headings} />
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Related -->
+  {
+    related.length > 0 && (
+      <section class="container mx-auto px-4 py-12 border-t border-border">
+        <div class="flex items-center gap-2 mb-8">
+          <div class="w-1 h-6 rounded-full bg-primary" />
+          <h2 class="text-xl font-bold">相关文章</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {related.map((rel) => (
+            <ArticleCard post={rel} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <div class="container mx-auto px-4 max-w-5xl">
+    <Giscus />
+  </div>
+</BaseLayout>

@@ -1,0 +1,44 @@
+---
+import { getCategories, getPostsByCategory } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Icon from '../../components/Icon.astro';
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  return categories.map((category) => ({
+    params: { category: category.name },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const posts = await getPostsByCategory(category.name);
+---
+
+<BaseLayout title={`分类：${category.name}`} description={category.description}>
+  <div class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-12">
+      <a href={withBase('/categories')} class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+        <Icon name="arrow-left" size={16} /> 全部分类
+      </a>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-4xl">{category.icon}</div>
+        <div>
+          <h1 class="text-3xl font-bold">{category.name}</h1>
+          <p class="text-muted-foreground mt-1">{category.description}</p>
+          <p class="text-sm text-muted-foreground mt-1">{posts.length} 篇文章</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map((post) => (
+        <ArticleCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

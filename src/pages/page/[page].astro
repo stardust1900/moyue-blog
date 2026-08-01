@@ -1,0 +1,47 @@
+---
+import { getSortedPosts, getTags, getCategories } from '../../utils/posts';
+import { POSTS_PER_PAGE } from '../../consts';
+import { withBase } from '../../utils/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomeList from '../../components/HomeList.astro';
+
+export async function getStaticPaths() {
+  const all = await getSortedPosts();
+  const total = Math.max(1, Math.ceil(all.length / POSTS_PER_PAGE));
+  const paths = [];
+  for (let i = 2; i <= total; i++) {
+    const start = (i - 1) * POSTS_PER_PAGE;
+    const chunk = all.slice(start, start + POSTS_PER_PAGE);
+    paths.push({
+      params: { page: String(i) },
+      props: {
+        posts: chunk,
+        current: i,
+        last: total,
+        prev: withBase('/page/' + (i - 1)),
+        next: i < total ? withBase('/page/' + (i + 1)) : null,
+      },
+    });
+  }
+  return paths;
+}
+
+const { posts, current, last, prev, next } = Astro.props;
+const all = await getSortedPosts();
+const tags = await getTags();
+const categories = await getCategories();
+---
+
+<BaseLayout title={`第 ${current} 页`}>
+  <HomeList
+    posts={posts}
+    current={current}
+    last={last}
+    prev={prev}
+    next={next}
+    allCount={all.length}
+    catCount={categories.length}
+    tagCount={tags.length}
+    tags={tags}
+  />
+</BaseLayout>

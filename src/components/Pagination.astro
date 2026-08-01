@@ -1,0 +1,53 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  current: number;
+  last: number;
+  prev?: string | null;
+  next?: string | null;
+}
+const { current, last, prev, next } = Astro.props;
+const numHref = (n: number) => (n === 1 ? '/' : `/page/${n}`);
+const pages = Array.from({ length: last }, (_, i) => i + 1);
+---
+
+{
+  last > 1 && (
+    <nav class="flex items-center justify-center gap-2 mt-12" aria-label="分页">
+      {prev ? (
+        <a href={prev} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
+          <Icon name="arrow-left" size={16} /> 上一页
+        </a>
+      ) : (
+        <span class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground/50 cursor-not-allowed">
+          <Icon name="arrow-left" size={16} /> 上一页
+        </span>
+      )}
+
+      {pages.map((n) => (
+        <a
+          href={numHref(n)}
+          class:list={[
+            'w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors',
+            n === current
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border hover:bg-muted',
+          ]}
+        >
+          {n}
+        </a>
+      ))}
+
+      {next ? (
+        <a href={next} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
+          下一页 <Icon name="arrow-right" size={16} />
+        </a>
+      ) : (
+        <span class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground/50 cursor-not-allowed">
+          下一页 <Icon name="arrow-right" size={16} />
+        </span>
+      )}
+    </nav>
+  )
+}

@@ -1,0 +1,28 @@
+---
+import { getCategories } from '../../utils/posts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import Icon from '../../components/Icon.astro';
+
+const categories = await getCategories();
+---
+
+<BaseLayout title="分类" description="按主题浏览文章，找到你感兴趣的内容">
+  <div class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-12">
+      <div class="flex items-center gap-3 mb-2">
+        <Icon name="folder-open" size={28} class="text-primary" />
+        <h1 class="text-3xl font-bold">分类</h1>
+      </div>
+      <p class="text-muted-foreground">按主题浏览文章，找到你感兴趣的内容</p>
+    </div>
+  </div>
+
+  <section class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {categories.map((cat) => (
+        <CategoryCard category={cat} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

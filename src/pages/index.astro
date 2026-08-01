@@ -1,0 +1,31 @@
+---
+import { getSortedPosts, getTags, getCategories } from '../utils/posts';
+import { POSTS_PER_PAGE } from '../consts';
+import { withBase } from '../utils/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeList from '../components/HomeList.astro';
+
+const all = await getSortedPosts();
+const tags = await getTags();
+const categories = await getCategories();
+const totalPages = Math.max(1, Math.ceil(all.length / POSTS_PER_PAGE));
+
+const featured = all[0];
+const pagePosts = all.slice(0, POSTS_PER_PAGE);
+const nextHref = totalPages > 1 ? withBase('/page/2') : null;
+---
+
+<BaseLayout>
+  <HomeList
+    posts={pagePosts}
+    current={1}
+    last={totalPages}
+    prev={null}
+    next={nextHref}
+    featured={featured}
+    allCount={all.length}
+    catCount={categories.length}
+    tagCount={tags.length}
+    tags={tags}
+  />
+</BaseLayout>

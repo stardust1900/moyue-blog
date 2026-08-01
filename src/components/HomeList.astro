@@ -1,0 +1,120 @@
+---
+import type { Post } from '../utils/posts';
+import { postSlug } from '../utils/posts';
+import { withBase } from '../utils/url';
+import ArticleCard from './ArticleCard.astro';
+import TagCloud from './TagCloud.astro';
+import Pagination from './Pagination.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  posts: Post[];
+  current: number;
+  last: number;
+  prev?: string | null;
+  next?: string | null;
+  featured?: Post;
+  allCount: number;
+  catCount: number;
+  tagCount: number;
+  tags: { name: string; count: number }[];
+}
+const { posts, current, last, prev, next, featured, allCount, catCount, tagCount, tags } = Astro.props;
+const featuredHref = featured ? withBase('/posts/' + postSlug(featured) + '/') : '#';
+---
+
+<!-- Hero -->
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-muted/40 to-background" />
+  <div class="container mx-auto px-4 py-20 md:py-28 relative">
+    <div class="max-w-3xl mx-auto text-center space-y-6 fade-up">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-background/60 backdrop-blur-sm">
+        <Icon name="feather" size={14} class="text-primary" />
+        <span class="text-xs font-medium text-muted-foreground">读书 · 技术分享 · 思考</span>
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+        在代码与文字之间，<br /><span class="text-primary">寻找思考的深度</span>
+      </h1>
+      <p class="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+        这里记录我读过的书、写过的代码、以及那些值得分享的思考。<br />每一篇文章，都是一次与自己的对话。
+      </p>
+      <div class="flex items-center justify-center gap-4 pt-4">
+        <a href={withBase('/categories')} class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+          浏览文章 <Icon name="arrow-right" size={16} />
+        </a>
+        <a href={withBase('/about')} class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors">
+          关于我
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-16">
+      {[
+        { label: '文章', value: allCount, icon: 'book-open' },
+        { label: '分类', value: catCount, icon: 'code' },
+        { label: '标签', value: tagCount, icon: 'feather' },
+      ].map((stat) => (
+        <div class="text-center p-4 rounded-2xl border border-border bg-card/50 backdrop-blur-sm">
+          <Icon name={stat.icon} size={20} class="mx-auto mb-2 text-primary" />
+          <div class="text-2xl font-bold">{stat.value}</div>
+          <div class="text-xs text-muted-foreground">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Featured -->
+{
+  featured && (
+    <section class="container mx-auto px-4 py-12">
+      <div class="flex items-center gap-2 mb-6">
+        <div class="w-1 h-6 rounded-full bg-primary" />
+        <h2 class="text-xl font-bold">置顶推荐</h2>
+      </div>
+      <a href={featuredHref} class="group block rounded-3xl border border-border bg-card overflow-hidden hover:shadow-xl transition-shadow">
+        <div class="grid md:grid-cols-2 gap-0">
+          <div class="flex items-center justify-center min-h-[240px] bg-gradient-to-br from-primary/10 to-muted text-8xl group-hover:scale-105 transition-transform duration-500">
+            {featured.data.coverEmoji}
+          </div>
+          <div class="p-8 flex flex-col justify-center space-y-4">
+            <div class="flex items-center gap-3 text-sm">
+              <span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">{featured.data.category}</span>
+              <span class="text-muted-foreground">{featured.data.date.toISOString().slice(0, 10)}</span>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold leading-tight group-hover:text-primary transition-colors">
+              {featured.data.title}
+            </h3>
+            <p class="text-muted-foreground leading-relaxed line-clamp-3">{featured.data.description}</p>
+            <div class="flex items-center gap-2 text-sm text-primary font-medium pt-2">
+              阅读全文 <Icon name="arrow-right" size={16} class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </a>
+    </section>
+  )
+}
+
+<!-- Latest -->
+<section class="container mx-auto px-4 py-12">
+  <div class="flex items-center gap-2 mb-8">
+    <div class="w-1 h-6 rounded-full bg-primary" />
+    <h2 class="text-xl font-bold">最新文章</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {posts.map((post) => (
+      <ArticleCard post={post} />
+    ))}
+  </div>
+  <Pagination current={current} last={last} prev={prev} next={next} />
+</section>
+
+<!-- Popular Tags -->
+<section class="container mx-auto px-4 py-12">
+  <div class="flex items-center gap-2 mb-6">
+    <div class="w-1 h-6 rounded-full bg-primary" />
+    <h2 class="text-xl font-bold">热门标签</h2>
+  </div>
+  <TagCloud tags={tags} />
+</section>
