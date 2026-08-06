@@ -3,7 +3,7 @@ export const SITE = {
   title: '墨阅',
   description: '一个关于读书与技术分享的个人博客。记录阅读的思考，分享编程的实践。',
   author: '墨阅',
-  url: 'https://gitee.com/wangyidao/moyue-blog',
+  url: 'https://github.com/stardust1900/moyue-blog',
   lang: 'zh-CN',
 };
 
@@ -15,8 +15,8 @@ export const NAV = [
 ];
 
 export const SOCIAL = {
-  github: '#',
-  email: 'mailto:hello@example.com',
+  github: 'https://github.com/stardust1900',
+  email: 'mailto:stardust1900@hotmail.com',
   rss: '/rss.xml',
 };
 
@@ -45,10 +45,10 @@ export const skills = [
 
 // Giscus 评论配置（需替换为你自己的 GitHub 仓库信息，见 README）
 export const giscus = {
-  repo: 'YOUR_GITHUB_USER/YOUR_REPO',
-  repoId: 'YOUR_REPO_ID',
+  repo: 'stardust1900/moyue-blog',
+  repoId: 'R_kgDOTvfv7g',
   category: 'Announcements',
-  categoryId: 'YOUR_CATEGORY_ID',
+  categoryId: 'DIC_kwDOTvfv7s4DCx9Q',
   mapping: 'pathname',
   lang: 'zh-CN',
 };
