@@ -1,0 +1,9 @@
+{
+  "title": "思考，快与慢",
+  "author": "丹尼尔·卡尼曼",
+  "cover": "cover.svg",
+  "chapters": [
+    { "slug": "第一章", "title": "第一章 系统1与系统2" },
+    { "slug": "第二章", "title": "第二章 注意力与效能" }
+  ]
+}

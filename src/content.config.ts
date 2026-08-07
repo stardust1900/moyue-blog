@@ -15,4 +15,11 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+// 书籍集合：每个章节 md 作为一条 entry，id 形如 "书名/章节名/内容"
+// 书籍元信息（书名/作者/封面）由同目录下的 book.json 提供，通过 utils/books.ts 读取
+const books = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/books' }),
+  schema: z.object({}),
+});
+
+export const collections = { posts, books };

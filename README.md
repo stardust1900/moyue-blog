@@ -12,6 +12,7 @@
 - 📑 文章详情右侧 **目录（TOC）**，带滚动高亮（scrollspy）与平滑跳转
 - 🏷️ 分类 / 标签浏览、相关文章推荐（按共享标签）
 - 📰 **RSS 订阅**（`/rss.xml`）
+- 📚 **书籍模块**：书籍列表 + 三栏阅读模式（章节树 / 正文 / 内容大纲）
 - 🌗 **暗色模式**切换（防闪烁，偏好持久化）
 - 📄 首页 **分页**
 - 💬 **Giscus 评论**（基于 GitHub Discussions 的静态评论）
@@ -33,11 +34,15 @@ src/
 ├── consts.ts            # 站点配置（≈ Jekyll _config.yml）：标题/导航/分类元信息/技能/阅读清单/Giscus
 ├── content.config.ts    # 文章集合 schema（frontmatter 校验）
 ├── content/posts/       # 文章（≈ Jekyll _posts）：YYYY-MM-DD-slug.md
+├── content/books/       # 书籍（书名/章节名/内容.md）：元信息与封面放书名目录
 ├── styles/global.css    # 设计 token + 排版 + 暗色主题
 ├── utils/posts.ts       # 文章查询/排序/分类/标签/相关文章/阅读时间
+├── utils/books.ts       # 书籍扫描/章节排序/封面解析
 ├── layouts/             # 布局（≈ Jekyll _layouts）
 ├── components/          # 可复用组件（≈ Jekyll _includes）
 └── pages/               # 路由页面
+    ├── books/index.astro          # 书籍列表页（/books）
+    └── books/[book]/[chapter].astro  # 阅读页（/books/书名/章节名）
 ```
 
 ## 写一篇新文章
@@ -59,6 +64,56 @@ draft: false
 ```
 
 `readingTime` 会自动根据字数估算，无需手写。`draft: true` 的文章不会被发布。
+
+## 添加一本书
+
+书籍内容存放在 `src/content/books/`，采用 `书名/章节名/内容.md` 的组织方式。导航栏「书籍」菜单（`/books`）会列出所有书籍，点击卡片进入阅读模式：**左侧章节树、中间正文、右侧内容大纲（基于 Markdown 标题）**。
+
+### 目录结构
+
+```
+src/content/books/
+└── 思考快与慢/              # 书名目录（= 书籍 slug，用于 URL）
+    ├── book.json           # 书籍元信息 + 有序章节列表
+    ├── cover.svg           # 封面图（png/jpg/jpeg/webp/svg/gif 均可）
+    ├── 第一章/
+    │   └── 内容.md         # 章节正文
+    └── 第二章/
+        └── 内容.md
+```
+
+### book.json
+
+```json
+{
+  "title": "思考，快与慢",
+  "author": "丹尼尔·卡尼曼",
+  "cover": "cover.svg",
+  "chapters": [
+    { "slug": "第一章", "title": "第一章 系统1与系统2" },
+    { "slug": "第二章", "title": "第二章 注意力与效能" }
+  ]
+}
+```
+
+| 字段 | 说明 |
+| --- | --- |
+| `title` | 书名（展示用） |
+| `author` | 作者 |
+| `cover` | 封面文件名，须与书名目录下的图片同名 |
+| `chapters` | **有序**章节列表（可选）。`slug` 对应章节目录名；`title` 可选，覆盖目录名作为展示标题 |
+
+章节会严格按 `chapters` 数组定义的顺序展示；未在该数组中声明的章节会自动排在后面（按目录名排序），不会遗漏。
+
+### 正文
+
+每个章节目录下放置 `内容.md`，内容即为该章正文。正文中的 `##` / `###` 等 Markdown 标题会自动生成右侧大纲锚点。
+
+### 导航与路由
+
+- 书籍列表：`/books`
+- 阅读页：`/books/<书名>/<章节名>`（书名、章节名会自动 URL 编码，中文无需处理）
+- 新增书籍只需在 `src/content/books/` 下放置上述结构，重新构建即可自动收录。
 
 ## 暗色模式
 

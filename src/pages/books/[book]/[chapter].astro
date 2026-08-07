@@ -1,0 +1,123 @@
+---
+import { getEntry, render } from 'astro:content';
+import { getAllBooks, getBook, getChapter } from '../../../utils/books';
+import { withBase } from '../../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import TableOfContents from '../../../components/TableOfContents.astro';
+
+export async function getStaticPaths() {
+  const books = await getAllBooks();
+  const paths: { params: { book: string; chapter: string }; props: { bookSlug: string; chapterSlug: string } }[] = [];
+  for (const book of books) {
+    for (const chapter of book.chapters) {
+      paths.push({
+        params: { book: book.slug, chapter: chapter.slug },
+        props: { bookSlug: book.slug, chapterSlug: chapter.slug },
+      });
+    }
+  }
+  return paths;
+}
+
+const { bookSlug, chapterSlug } = Astro.props;
+const book = (await getBook(bookSlug))!;
+const chapter = (await getChapter(bookSlug, chapterSlug))!;
+const entry = await getEntry('books', chapter.id);
+const { Content, headings } = await render(entry!);
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+
+const chapterIndex = book.chapters.findIndex((c) => c.slug === chapterSlug);
+const prevChapter = chapterIndex > 0 ? book.chapters[chapterIndex - 1] : null;
+const nextChapter = chapterIndex < book.chapters.length - 1 ? book.chapters[chapterIndex + 1] : null;
+---
+
+<BaseLayout title={`${book.title} · ${chapter.title}`} description={`${book.title} — ${chapter.title}`}>
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-wrap items-center gap-4 mb-6">
+      <a href={withBase('/books')} class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <Icon name="arrow-left" size={16} /> 书籍列表
+      </a>
+      <span class="text-sm text-muted-foreground/50">/</span>
+      <a href={withBase(`/books/${encodeURIComponent(book.slug)}/${encodeURIComponent(book.chapters[0].slug)}`)} class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <Icon name="list-tree" size={16} /> {book.title}（章节）
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[260px_1fr_240px] gap-8 items-start">
+      <!-- 左栏：书名 + 章节树 -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-4">
+          <div class="rounded-2xl border border-border bg-card overflow-hidden">
+            {book.cover && (
+              <img src={book.cover} alt={book.title} class="w-full aspect-[3/4] object-cover" />
+            )}
+            <div class="p-4">
+              <h2 class="font-bold leading-snug">{book.title}</h2>
+              <p class="text-sm text-muted-foreground mt-1">{book.author}</p>
+            </div>
+          </div>
+          <nav class="rounded-2xl border border-border bg-card p-3">
+            <div class="flex items-center gap-2 px-2 py-1.5 mb-1 text-sm font-semibold text-foreground">
+              <Icon name="list-tree" size={16} /> 章节
+            </div>
+            <ul class="space-y-0.5">
+              {book.chapters.map((c) => {
+                const active = c.slug === chapterSlug;
+                const href = withBase(`/books/${encodeURIComponent(book.slug)}/${encodeURIComponent(c.slug)}`);
+                return (
+                  <li>
+                    <a
+                      href={href}
+                      class:list={[
+                        'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
+                        active
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                      ]}
+                    >
+                      <Icon name={active ? 'folder-open' : 'book-open'} size={14} class="shrink-0" />
+                      <span class="truncate">{c.title}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- 中栏：内容 -->
+      <article class="min-w-0">
+        <header class="mb-8 border-b border-border pb-6">
+          <p class="text-sm text-muted-foreground mb-2">{book.title}</p>
+          <h1 class="text-3xl md:text-4xl font-bold leading-tight">{chapter.title}</h1>
+        </header>
+        <div class="prose-blog">
+          <Content />
+        </div>
+
+        <!-- 上一章 / 下一章 -->
+        <nav class="mt-12 flex items-center justify-between gap-4 border-t border-border pt-6">
+          {prevChapter ? (
+            <a href={withBase(`/books/${encodeURIComponent(book.slug)}/${encodeURIComponent(prevChapter.slug)}`)} class="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Icon name="arrow-left" size={16} /> <span><span class="block text-xs">上一章</span><span class="font-medium text-foreground group-hover:text-primary truncate">{prevChapter.title}</span></span>
+            </a>
+          ) : <span />}
+          {nextChapter ? (
+            <a href={withBase(`/books/${encodeURIComponent(book.slug)}/${encodeURIComponent(nextChapter.slug)}`)} class="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-right">
+              <span><span class="block text-xs">下一章</span><span class="font-medium text-foreground group-hover:text-primary truncate">{nextChapter.title}</span></span> <Icon name="arrow-right" size={16} />
+            </a>
+          ) : <span />}
+        </nav>
+      </article>
+
+      <!-- 右栏：标题大纲 -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <TableOfContents headings={tocHeadings} />
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

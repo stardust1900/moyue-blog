@@ -1,0 +1,69 @@
+---
+import { getAllBooks } from '../../utils/books';
+import { withBase } from '../../utils/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+
+const books = await getAllBooks();
+---
+
+<BaseLayout title="书籍" description="书籍阅读模块：结构化整理与阅读书籍内容。">
+  <!-- Hero -->
+  <section class="border-b border-border bg-gradient-to-b from-muted/30 to-background">
+    <div class="container mx-auto px-4 py-16 md:py-20">
+      <div class="max-w-3xl mx-auto text-center space-y-6">
+        <div class="flex justify-center">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
+            <Icon name="book-open" size={36} class="text-white" />
+          </div>
+        </div>
+        <h1 class="text-4xl font-bold tracking-tight">书籍</h1>
+        <p class="text-lg text-muted-foreground leading-relaxed">
+          以「书名 / 章节 / 内容」的方式整理与阅读好书。选一本书，开启沉浸式阅读。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 列表 -->
+  <section class="container mx-auto px-4 py-16">
+    {
+      books.length === 0 ? (
+        <div class="text-center py-24 text-muted-foreground">
+          <Icon name="book-open" size={48} class="mx-auto mb-4 opacity-40" />
+          <p>暂无书籍，请在 <code class="px-1.5 py-0.5 rounded bg-muted">src/content/books</code> 下添加。</p>
+        </div>
+      ) : (
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {books.map((book) => {
+            const firstChapter = book.chapters[0];
+            const href = firstChapter
+              ? withBase(`/books/${encodeURIComponent(book.slug)}/${encodeURIComponent(firstChapter.slug)}`)
+              : withBase(`/books/${encodeURIComponent(book.slug)}`);
+            return (
+              <a href={href} class="group block">
+                <div class="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-primary/40">
+                  <div class="aspect-[3/4] overflow-hidden bg-muted">
+                    {book.cover ? (
+                      <img src={book.cover} alt={book.title} class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                    ) : (
+                      <div class="flex h-full w-full items-center justify-center text-5xl text-muted-foreground">📖</div>
+                    )}
+                  </div>
+                  <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-10">
+                    <h3 class="font-bold text-white leading-snug line-clamp-2">{book.title}</h3>
+                    <p class="text-sm text-white/70 mt-0.5">{book.author}</p>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between px-1 pt-3">
+                  <span class="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">{book.title}</span>
+                  <span class="text-xs text-muted-foreground whitespace-nowrap ml-2">{book.chapters.length} 章</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

@@ -11,6 +11,7 @@ export const NAV = [
   { label: '首页', path: '/' },
   { label: '分类', path: '/categories' },
   { label: '标签', path: '/tags' },
+  { label: '书籍', path: '/books' },
   { label: '关于', path: '/about' },
 ];
 
