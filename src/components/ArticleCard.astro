@@ -1,6 +1,6 @@
 ---
 import type { Post } from '../utils/posts';
-import { postSlug, estimateReadingTime } from '../utils/posts';
+import { postHref, estimateReadingTime } from '../utils/posts';
 import { withBase } from '../utils/url';
 import FormattedDate from './FormattedDate.astro';
 import Icon from './Icon.astro';
@@ -10,7 +10,7 @@ interface Props {
 }
 const { post } = Astro.props;
 const { title, category, tags, date, description, coverEmoji } = post.data;
-const href = withBase('/posts/' + postSlug(post) + '/');
+const href = withBase(postHref(post));
 const readingTime = estimateReadingTime(post.body);
 ---
 

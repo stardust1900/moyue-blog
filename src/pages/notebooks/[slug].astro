@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import { getRelatedPosts, postSlug } from '../../utils/posts';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const notebooks = await getCollection('notebooks', ({ data }) => !data.draft);
+  return notebooks.map((post) => ({
+    params: { slug: postSlug(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const related = await getRelatedPosts(post);
+// notebook 正文已由 loader 渲染为 HTML，从 data.bodyHtml 取出；
+// 目录 headings 由 loader 从 markdown 单元格提取并存入 data.headings。
+const bodyHtml = post.data.bodyHtml ?? '';
+const headings = post.data.headings ?? [];
+---
+
+<PostLayout post={post} headings={headings} related={related} bodyHtml={bodyHtml} />

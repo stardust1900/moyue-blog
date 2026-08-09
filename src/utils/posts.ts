@@ -1,17 +1,28 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { categoryMeta } from '../consts';
 
-export type Post = CollectionEntry<'posts'>;
+// Post 包含 markdown 文章(posts) 与 Jupyter notebook 文章(notebooks) 两类
+export type Post = CollectionEntry<'posts'> | CollectionEntry<'notebooks'>;
 
 // 去掉 Jekyll 式日期前缀，得到干净的 slug（用于 URL）
 export function postSlug(post: Post): string {
   return post.id.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 }
 
-// 按日期降序获取已发布文章
+// 根据集合返回文章详情页路径前缀：posts -> /posts/，notebooks -> /notebooks/
+export function postHref(post: Post): string {
+  const prefix = post.collection === 'notebooks' ? '/notebooks/' : '/posts/';
+  return prefix + postSlug(post) + '/';
+}
+
+// 按日期降序获取已发布文章（合并 posts 与 notebooks 两个集合）
 export async function getSortedPosts(): Promise<Post[]> {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const [postEntries, notebookEntries] = await Promise.all([
+    getCollection('posts', ({ data }) => !data.draft),
+    getCollection('notebooks', ({ data }) => !data.draft),
+  ]);
+  const all = [...postEntries, ...notebookEntries];
+  return all.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
 // 中文长日期格式：2026年7月28日
@@ -77,7 +88,7 @@ export async function getPostsByTag(tag: string): Promise<Post[]> {
 export async function getRelatedPosts(post: Post, limit = 3): Promise<Post[]> {
   const posts = await getSortedPosts();
   return posts
-    .filter((p) => p.id !== post.id)
+    .filter((p) => p.collection !== post.collection || p.id !== post.id)
     .map((p) => ({
       post: p,
       common: p.data.tags.filter((t) => post.data.tags.includes(t)).length,

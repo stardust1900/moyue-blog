@@ -13,8 +13,10 @@ interface Props {
   post: Post;
   headings: { depth: number; slug: string; text: string }[];
   related: Post[];
+  // notebook 文章：已渲染的 HTML 正文（由 notebook-loader 生成），用 set:html 注入
+  bodyHtml?: string;
 }
-const { post, headings, related } = Astro.props;
+const { post, headings, related, bodyHtml } = Astro.props;
 const { title, category, tags, date, description, coverEmoji } = post.data;
 const readingTime = estimateReadingTime(post.body);
 ---
@@ -54,8 +56,8 @@ const readingTime = estimateReadingTime(post.body);
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-12 max-w-5xl mx-auto">
       <div class="min-w-0">
         <div class="text-5xl mb-8 text-center">{coverEmoji}</div>
-        <article class="prose-blog">
-          <slot />
+        <article class="prose-blog notebook-content">
+          {bodyHtml ? <Fragment set:html={bodyHtml} /> : <slot />}
         </article>
 
         <div class="mt-12 pt-8 border-t border-border flex items-center justify-between">

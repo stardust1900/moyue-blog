@@ -1,6 +1,6 @@
 ---
 import type { Post } from '../utils/posts';
-import { postSlug } from '../utils/posts';
+import { postHref } from '../utils/posts';
 import { withBase } from '../utils/url';
 import ArticleCard from './ArticleCard.astro';
 import TagCloud from './TagCloud.astro';
@@ -20,7 +20,7 @@ interface Props {
   tags: { name: string; count: number }[];
 }
 const { posts, current, last, prev, next, featured, allCount, catCount, tagCount, tags } = Astro.props;
-const featuredHref = featured ? withBase('/posts/' + postSlug(featured) + '/') : '#';
+const featuredHref = featured ? withBase(postHref(featured)) : '#';
 ---
 
 <!-- Hero -->

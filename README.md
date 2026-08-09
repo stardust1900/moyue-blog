@@ -20,12 +20,17 @@
 
 ## 快速开始
 
+**环境要求**：Node.js 18.20.8+（或 20 / 22 LTS），npm 9+。
+
 ```bash
-npm install
-npm run dev        # 本地预览 http://localhost:4321
-npm run build      # 产物输出到 dist/
-npm run preview    # 预览构建产物
+npm install        # 安装依赖
+npm run dev        # 本地开发预览 http://localhost:4321
+npm run build      # 构建静态站点，产物输出到 dist/
+npm run preview    # 本地预览构建产物
+npm run check      # 类型检查（需首次交互安装 @astrojs/check）
 ```
+
+依赖安装一次后，日常只需 `npm run dev`（开发）或 `npm run build`（发布）。
 
 ## 目录结构（类 Jekyll）
 
@@ -34,6 +39,7 @@ src/
 ├── consts.ts            # 站点配置（≈ Jekyll _config.yml）：标题/导航/分类元信息/技能/阅读清单/Giscus
 ├── content.config.ts    # 文章集合 schema（frontmatter 校验）
 ├── content/posts/       # 文章（≈ Jekyll _posts）：YYYY-MM-DD-slug.md
+├── content/notebooks/   # Jupyter 笔记本文章：YYYY-MM-DD-slug.ipynb
 ├── content/books/       # 书籍（书名/章节名/内容.md）：元信息与封面放书名目录
 ├── styles/global.css    # 设计 token + 排版 + 暗色主题
 ├── utils/posts.ts       # 文章查询/排序/分类/标签/相关文章/阅读时间
@@ -64,6 +70,58 @@ draft: false
 ```
 
 `readingTime` 会自动根据字数估算，无需手写。`draft: true` 的文章不会被发布。
+
+> 文件名必须以 `YYYY-MM-DD-slug` 开头（如 `2026-08-01-my-post.md`），日期用于排序与默认发布时间；`slug`（连字符分隔）同时作为访问 URL，`title` 可自由书写。
+
+**通用 frontmatter 字段**（Markdown 与 Notebook 文章一致）：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `title` | 建议 | 文章标题，缺省时按文件名生成 |
+| `date` | 否 | 发布日期，缺省时按文件名推导 |
+| `category` | 否 | 分类，缺省 `技术笔记` |
+| `tags` | 否 | 标签数组，用于聚合与推荐 |
+| `description` | 否 | 列表 / RSS 摘要 |
+| `coverEmoji` | 否 | 列表封面 emoji，缺省 `📓` |
+| `draft` | 否 | `true` 时不发布 |
+
+## 写一篇 Jupyter Notebook 文章
+
+在 `src/content/notebooks/` 下放置 `YYYY-MM-DD-your-slug.ipynb`，博客会自动将其渲染为一篇文章，并复用与 Markdown 文章一致的详情页、目录、相关文章与评论。**代码单元格会使用 GitHub Dark 主题高亮，已保存的执行输出（图片 / 表格 / 文本 / 错误）也会被渲染**，但不会重新执行内核，构建稳定可复现。
+
+### 元信息（frontmatter）
+
+元信息写在 **notebook 第一个 Markdown 单元格的顶部**，格式与 Markdown 文章完全一致（`---` 包裹的 YAML），正文写在 frontmatter 之后：
+
+```markdown
+---
+title: "用 Pandas 分析销售数据"
+date: 2026-08-01
+category: "后端技术"
+tags: ["Python", "数据分析"]
+description: "一句话摘要，用于列表与 RSS。"
+coverEmoji: "📊"
+draft: false
+---
+
+# 正文标题
+
+你的 notebook 正文……
+```
+
+| 字段 | 说明 | 默认值 |
+| --- | --- | --- |
+| `title` | 文章标题 | 文件名（去日期前缀，连字符转空格） |
+| `date` | 发布日期 | 从文件名 `YYYY-MM-DD` 推导，否则取当前日期 |
+| `category` | 分类 | `技术笔记` |
+| `tags` | 标签数组 | `[]` |
+| `description` | 摘要（列表 / RSS 用） | 空 |
+| `coverEmoji` | 封面 emoji | `📓` |
+| `draft` | 是否为草稿 | `false` |
+
+> 若 notebook 没有 frontmatter，**不会报错**，会基于文件名与默认值自动生成上述默认元数据，正常发布。
+
+notebook 文章与 Markdown 文章在首页、分类、标签、RSS、分页中**自动合并展示**；详情页路由为 `/notebooks/<slug>/`，与 `/posts/<slug>/` 相互独立，不会发生 slug 冲突。
 
 ## 添加一本书
 
@@ -152,3 +210,12 @@ SITE_URL=https://<用户名>.github.io/moyue-blog SITE_BASE=/moyue-blog/ npm run
 | --- | --- | --- |
 | `SITE_URL` | 站点绝对地址（RSS / canonical 用） | `https://gitee.com/wangyidao/moyue-blog` |
 | `SITE_BASE` | 子路径前缀（如 `/moyue-blog/`） | 空（根路径） |
+
+## 常见问题
+
+- **Notebook 代码会重新执行吗？** 不会。只渲染 notebook 中已保存的单元格与输出，保证构建可复现、无需 Python 环境。
+- **Notebook 没有写元信息会报错吗？** 不会。未写 frontmatter 时按文件名与默认值生成文章元数据并正常发布。
+- **草稿如何不被发布？** Markdown / Notebook 的 frontmatter 加 `draft: true` 即可（首页、RSS、详情页均会排除）。
+- **修改站点信息 / 导航 / Giscus / 阅读清单？** 统一在 `src/consts.ts` 配置，无需改动组件。
+- **分类、标签、相关文章需要额外配置吗？** 不需要，均由文章 frontmatter 自动聚合；相关文章按共享标签推荐。
+- **本地开发端口被占用？** 用 `npm run dev -- --port 4000` 指定其他端口。
