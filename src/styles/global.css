@@ -423,19 +423,39 @@
   overflow: hidden;
   background: color-mix(in oklab, var(--primary) 4%, var(--card));
 }
-/* 输入区（Python 源码）：去掉 Shiki 自带外边距/圆角，融入卡片 */
+/* 输入区（Python 源码）：去掉 Shiki 自带外边距/圆角，融入卡片。
+   注意 notebook 由 codeToHtml 生成的 pre 类为 "shiki github-dark"（无 astro-code），需用 pre.shiki 匹配 */
 .prose-blog .notebook-input { position: relative; padding-bottom: 0.4rem; }
-.prose-blog .notebook-input pre.astro-code {
+.prose-blog .notebook-input pre.shiki {
   margin: 0;
   border: none;
   border-radius: 0;
-  background: color-mix(in oklab, var(--primary) 6%, var(--card)) !important;
+  /* 保留 Shiki github-dark 自带的暗色背景，确保明亮/暗色模式下代码文字均清晰 */
+  counter-reset: notebook-line;
+  padding-left: 0.5rem;
+}
+/* Python 代码块显示行号 */
+.prose-blog .notebook-input pre.shiki code { display: block; width: fit-content; min-width: 100%; }
+.prose-blog .notebook-input pre.shiki .line {
+  position: relative;
+  counter-increment: notebook-line;
+  padding-left: 3.5rem;
+}
+.prose-blog .notebook-input pre.shiki .line::before {
+  content: counter(notebook-line);
+  position: absolute;
+  left: 0.4rem;
+  width: 2.2rem;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 /* 输出区：与输入区用明显的间隔 + 分隔线隔开 */
 .prose-blog .notebook-outputs {
   margin-top: 0.9rem;
   border-top: 1px dashed var(--border);
-  padding: 0.9rem 1.25rem 0.75rem;
+  padding: 0.9rem 1.25rem 0.75rem 2.25rem;
   background: var(--muted);
   font-size: 0.875rem;
   line-height: 1.6;
