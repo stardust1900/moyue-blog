@@ -411,6 +411,48 @@
 .prose-blog strong { font-weight: 700; color: var(--foreground); }
 .prose-blog em { font-style: italic; }
 
+/* ================================================================
+   Notebook 代码块 — 输入内容与正文区分样式
+   ================================================================ */
+/* 单个代码单元格：浅色卡片 + 左侧强调色竖条，与正文明显区分 */
+.prose-blog .notebook-code { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+.prose-blog .notebook-code-cell {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--primary) 4%, var(--card));
+}
+/* 输入区（Python 源码）：去掉 Shiki 自带外边距/圆角，融入卡片 */
+.prose-blog .notebook-input { position: relative; padding-bottom: 0.4rem; }
+.prose-blog .notebook-input pre.astro-code {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: color-mix(in oklab, var(--primary) 6%, var(--card)) !important;
+}
+/* 输出区：与输入区用明显的间隔 + 分隔线隔开 */
+.prose-blog .notebook-outputs {
+  margin-top: 0.9rem;
+  border-top: 1px dashed var(--border);
+  padding: 0.9rem 1.25rem 0.75rem;
+  background: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.prose-blog .notebook-outputs:empty { display: none; }
+.prose-blog .notebook-output-img { margin: 0; border-radius: 0.5rem; }
+.prose-blog .notebook-output-text,
+.prose-blog .notebook-stream,
+.prose-blog .notebook-error {
+  margin: 0;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  white-space: pre-wrap;
+}
+.prose-blog .notebook-error { color: var(--destructive); }
+
 /* Line clamp utility */
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

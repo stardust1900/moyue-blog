@@ -239,11 +239,10 @@ export async function renderNotebook(raw: string, filename: string): Promise<Not
       const highlighted = await codeToHtml(source, {
         lang,
         theme: 'github-dark',
-      }).catch(
-        () =>
-          `<pre class="shiki"><code>${escapeHtml(source)}</code></pre>`
-      );
-      const execCount = cell.execution_count != null ? cell.execution_count : '';
+        }).catch(
+          () =>
+            `<pre class="shiki"><code>${escapeHtml(source)}</code></pre>`
+        );
       let outputsHtml = '';
       const outputs: any[] = cell.outputs ?? [];
       if (outputs.length) {
@@ -254,7 +253,6 @@ export async function renderNotebook(raw: string, filename: string): Promise<Not
         `<section class="notebook-code">` +
           `<div class="notebook-code-cell">` +
           `<div class="notebook-input">` +
-          `<div class="notebook-prompt">In [${execCount}]:</div>` +
           highlighted +
           `</div>` +
           outputsHtml +
