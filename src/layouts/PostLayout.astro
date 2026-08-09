@@ -96,4 +96,9 @@ const readingTime = estimateReadingTime(post.body);
   <div class="container mx-auto px-4 max-w-5xl">
     <Giscus />
   </div>
+
+  <script>
+    import { initArticleHighlight } from '../utils/article-search';
+    initArticleHighlight();
+  </script>
 </BaseLayout>

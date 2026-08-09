@@ -1,14 +1,20 @@
 ---
 import Icon from './Icon.astro';
+import { withBase } from '../utils/url';
 
 interface Props {
   current: number;
   last: number;
   prev?: string | null;
   next?: string | null;
+  base?: string;
+  query?: string;
 }
-const { current, last, prev, next } = Astro.props;
-const numHref = (n: number) => (n === 1 ? '/' : `/page/${n}`);
+const { current, last, prev, next, base = '/page', query = '' } = Astro.props;
+const qs = query ? `?${query}` : '';
+const numHref = (n: number) =>
+  withBase(n === 1 ? base.replace(/\/page$/, '') : `${base}/${n}`) + qs;
+const withQuery = (href: string | null) => (href ? href + qs : href);
 const pages = Array.from({ length: last }, (_, i) => i + 1);
 ---
 
@@ -16,7 +22,7 @@ const pages = Array.from({ length: last }, (_, i) => i + 1);
   last > 1 && (
     <nav class="flex items-center justify-center gap-2 mt-12" aria-label="分页">
       {prev ? (
-        <a href={prev} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
+        <a href={withQuery(prev)} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
           <Icon name="arrow-left" size={16} /> 上一页
         </a>
       ) : (
@@ -40,7 +46,7 @@ const pages = Array.from({ length: last }, (_, i) => i + 1);
       ))}
 
       {next ? (
-        <a href={next} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
+        <a href={withQuery(next)} class="flex items-center gap-1 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm">
           下一页 <Icon name="arrow-right" size={16} />
         </a>
       ) : (

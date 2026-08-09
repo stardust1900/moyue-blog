@@ -1,0 +1,86 @@
+---
+import type { Post } from '../utils/posts';
+import { postHref } from '../utils/posts';
+import { withBase } from '../utils/url';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+---
+
+<div class="overflow-x-auto rounded-2xl border border-border bg-card">
+  <table class="w-full border-collapse text-sm" data-post-table>
+    <thead>
+      <tr class="border-b border-border bg-muted/40 text-left text-muted-foreground">
+        <th class="px-5 py-3 font-semibold">文章标题</th>
+        <th class="px-5 py-3 font-semibold whitespace-nowrap">发表时间</th>
+        <th class="px-5 py-3 font-semibold whitespace-nowrap">分类</th>
+        <th class="px-5 py-3 font-semibold">标签</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        posts.map((post) => {
+          const { title, category, tags, date } = post.data;
+          const href = withBase(postHref(post));
+          return (
+            <tr
+              class="group border-b border-border last:border-0 transition-colors hover:bg-muted/50"
+              data-search-row
+              data-title={title}
+              data-category={category}
+              data-tags={tags.join(' ')}
+              data-body={post.body ?? ''}
+            >
+              <td class="px-5 py-4">
+                <a
+                  href={href}
+                  class="font-medium text-foreground transition-colors group-hover:text-primary"
+                  data-search-field="title"
+                >
+                  {title}
+                </a>
+              </td>
+              <td class="px-5 py-4 whitespace-nowrap text-muted-foreground" data-search-field="date">
+                <FormattedDate date={date} />
+              </td>
+              <td class="px-5 py-4 whitespace-nowrap">
+                <a
+                  href={withBase('/categories/' + encodeURIComponent(category) + '/')}
+                  class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                  data-search-field="category"
+                >
+                  {category}
+                </a>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <a
+                      href={withBase('/tags/' + encodeURIComponent(tag) + '/')}
+                      class="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                      data-search-field="tags"
+                    >
+                      {tag}
+                    </a>
+                  ))}
+                </div>
+              </td>
+            </tr>
+          );
+        })
+      }
+      {
+        posts.length === 0 && (
+          <tr>
+            <td colspan="4" class="px-5 py-12 text-center text-muted-foreground">
+              暂无文章
+            </td>
+          </tr>
+        )
+      }
+    </tbody>
+  </table>
+</div>

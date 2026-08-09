@@ -481,3 +481,12 @@
 @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 .fade-up { animation: fade-up 0.5s var(--ease-out) both; }
 @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+
+/* 搜索命中文字高亮（明暗模式均可见） */
+mark.search-hit {
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+  color: var(--primary);
+  border-radius: 2px;
+  padding: 0 1px;
+  font-weight: 600;
+}

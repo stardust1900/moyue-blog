@@ -1,0 +1,78 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  value?: string;
+}
+const { value = '' } = Astro.props;
+---
+
+<form class="flex flex-col gap-2 sm:flex-row sm:items-center" data-search-form>
+  <div class="relative w-full sm:w-72">
+    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+      <Icon name="search" size={16} />
+    </span>
+    <input
+      type="text"
+      name="q"
+      value={value}
+      placeholder="搜索文章标题、分类或标签…"
+      autocomplete="off"
+      data-search-input
+      class="w-full rounded-xl border border-input bg-background py-2.5 pl-9 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30"
+    />
+    <button
+      type="button"
+      data-search-clear
+      aria-label="清空搜索"
+      class="absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+    >
+      <Icon name="x" size={16} />
+    </button>
+  </div>
+  <button
+    type="submit"
+    class="inline-flex w-full min-w-[88px] items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
+  >
+    搜索
+  </button>
+</form>
+<p class="text-xs text-muted-foreground" data-search-count></p>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-search-form]');
+  const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+  const clearBtn = document.querySelector<HTMLButtonElement>('[data-search-clear]');
+  if (form && input) {
+    const emit = (q: string) => {
+      const params = new URLSearchParams(window.location.search);
+      if (q) params.set('q', q);
+      else params.delete('q');
+      const qs = params.toString();
+      const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+      window.history.replaceState(null, '', url);
+      window.dispatchEvent(new CustomEvent('post-search', { detail: { q } }));
+    };
+    const toggleClear = () => {
+      if (clearBtn) clearBtn.classList.toggle('hidden', input.value.length === 0);
+    };
+    const run = () => {
+      emit(input.value.trim());
+      toggleClear();
+    };
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      run();
+    });
+    input.addEventListener('input', toggleClear);
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        input.value = '';
+        input.focus();
+        emit('');
+        toggleClear();
+      });
+    }
+    toggleClear();
+  }
+</script>

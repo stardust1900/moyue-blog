@@ -1,0 +1,60 @@
+---
+import { getSortedPosts } from '../../../utils/posts';
+import { POSTS_PER_PAGE } from '../../../consts';
+import { withBase } from '../../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostTable from '../../../components/PostTable.astro';
+import SearchBar from '../../../components/SearchBar.astro';
+import Pagination from '../../../components/Pagination.astro';
+
+export async function getStaticPaths() {
+  const all = await getSortedPosts();
+  const total = Math.max(1, Math.ceil(all.length / POSTS_PER_PAGE));
+  const paths = [];
+  for (let i = 2; i <= total; i++) {
+    const start = (i - 1) * POSTS_PER_PAGE;
+    const chunk = all.slice(start, start + POSTS_PER_PAGE);
+    paths.push({
+      params: { page: String(i) },
+      props: { posts: chunk, current: i, last: total },
+    });
+  }
+  return paths;
+}
+
+const { posts, current, last } = Astro.props;
+const q = Astro.url.searchParams.get('q')?.trim() ?? '';
+const all = await getSortedPosts();
+---
+
+<BaseLayout title={`文章列表 · 第 ${current} 页`}>
+  <section class="container mx-auto px-4 py-12">
+    <div class="mb-8 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-1 h-6 rounded-full bg-primary" />
+        <h1 class="text-2xl font-bold">文章列表</h1>
+      </div>
+      <span class="text-sm text-muted-foreground">共 {all.length} 篇</span>
+    </div>
+
+    <div class="mb-6">
+      <SearchBar value={q} />
+    </div>
+
+    <PostTable posts={posts} />
+
+    <Pagination
+      current={current}
+      last={last}
+      prev={withBase('/posts')}
+      next={current < last ? withBase('/posts/page/' + (current + 1)) : null}
+      base="/posts/page"
+      query={q ? `q=${encodeURIComponent(q)}` : ''}
+    />
+  </section>
+</BaseLayout>
+
+<script>
+  import { initPostSearch } from '../../../utils/post-search';
+  initPostSearch();
+</script>
