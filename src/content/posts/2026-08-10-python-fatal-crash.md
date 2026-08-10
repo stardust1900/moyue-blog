@@ -4,7 +4,7 @@ date: 2026-08-10
 category: "技术笔记"
 tags: ["python","异常","报错"]
 description: "这是一个典型的 V8 / PyMiniRacer 内存分区初始化冲突"
-coverEmoji: "📚"
+coverEmoji: "❓"
 draft: false
 ---
 
