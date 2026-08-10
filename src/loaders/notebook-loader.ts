@@ -4,6 +4,7 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { renderNotebook } from '../utils/notebook-render';
 
 const NOTEBOOKS_DIR = 'src/content/notebooks';
@@ -32,7 +33,7 @@ export function notebookLoader(): Loader {
   return {
     name: 'notebook-loader',
     async load(context: LoaderContext): Promise<void> {
-      const root = context.config.root.pathname;
+      const root = fileURLToPath(context.config.root);
       const basePath = path.resolve(root, NOTEBOOKS_DIR);
       const files = await collectIpynb(basePath);
 

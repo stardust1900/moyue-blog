@@ -224,12 +224,15 @@ export async function renderNotebook(raw: string, filename: string): Promise<Not
 
     if (cell.cell_type === 'markdown') {
       // 第一个 markdown cell：拆分 frontmatter 与正文，仅正文参与渲染/目录/阅读时间
-      const md =
-        isFirstMarkdown && firstMarkdown === cell
-          ? splitFrontmatter(source).body
-          : source;
+      let md = source;
+      if (isFirstMarkdown && firstMarkdown === cell) {
+        const parsed = splitFrontmatter(source);
+        // 仅当该 cell 确实包含 frontmatter 时，才用剥离后的正文；
+        // 否则保持 source 不变（让空正文即空，不要回退到含 frontmatter 的 source）
+        if (Object.keys(parsed.data).length > 0) md = parsed.body;
+      }
       isFirstMarkdown = false;
-      const mdText = md.trim() ? md : source;
+      const mdText = md.trim() ? md : '';
       plain += mdText + '\n';
       allHeadings.push(...extractHeadings(mdText));
       htmlParts.push(`<section class="notebook-markdown">${marked.parse(mdText)}</section>`);
