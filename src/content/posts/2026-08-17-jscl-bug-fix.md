@@ -4,7 +4,7 @@ date: 2026-08-17
 category: "技术笔记"
 tags: ["AI","苏超","flutter"]
 description: "使用codebuddy修复江苏城市联赛积分榜bug"
-coverEmoji: "🚀"
+coverEmoji: "🪲"
 draft: false
 ---
 
