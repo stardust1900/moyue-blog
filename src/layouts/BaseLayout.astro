@@ -22,6 +22,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <title>{pageTitle}</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3202703159392077" crossorigin="anonymous"></script>
+    <script>
+      import Clarity from '@microsoft/clarity';
+      Clarity.init('wwhkmu5o9p');
+    </script>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={pageTitle} />
