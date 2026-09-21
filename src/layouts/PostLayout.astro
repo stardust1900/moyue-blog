@@ -101,4 +101,52 @@ const readingTime = estimateReadingTime(post.body);
     import { initArticleHighlight } from '../utils/article-search';
     initArticleHighlight();
   </script>
+
+  <!-- Mermaid：把 ```mermaid 代码块渲染为 SVG 图；附带图片/Mermaid 点击放大查看 -->
+  <script>
+    import mermaid from 'mermaid';
+    import { initImageZoom } from '../utils/image-zoom';
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
+      // 与博客字体栈一致，避免用 fallback 字体测量导致节点文字被裁
+      fontFamily:
+        '"Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+      // 关闭 foreignObject 渲染：节点文字改用原生 <text>，避免被 foreignObject 的 overflow:hidden 硬裁
+      htmlLabels: false,
+      flowchart: { useMaxWidth: true },
+    });
+    async function renderMermaid() {
+      // 等待 web 字体加载完成后再测量渲染，否则节点宽度按 fallback 字体计算会截断文字
+      try {
+        await document.fonts.ready;
+      } catch {
+        /* 环境不支持时直接渲染 */
+      }
+      const codes = document.querySelectorAll('pre[data-language="mermaid"] code');
+      for (const code of codes) {
+        const text = code.textContent ?? '';
+        if (!text.trim()) continue;
+        const pre = code.closest('pre');
+        try {
+          const id = 'mermaid-' + Math.random().toString(36).slice(2);
+          const { svg } = await mermaid.render(id, text);
+          const div = document.createElement('div');
+          div.className = 'mermaid';
+          div.innerHTML = svg;
+          if (pre?.parentNode) pre.replaceWith(div);
+          else code.replaceWith(div);
+        } catch (err) {
+          console.error('[mermaid] render failed:', err);
+        }
+      }
+    }
+    initImageZoom();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderMermaid);
+    } else {
+      renderMermaid();
+    }
+  </script>
 </BaseLayout>

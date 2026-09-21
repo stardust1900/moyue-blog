@@ -405,6 +405,49 @@
 /* Images */
 .prose-blog img { max-width: 100%; height: auto; border-radius: 0.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem; }
 
+/* Mermaid 图表：将 ```mermaid 代码块渲染为 SVG */
+.prose-blog .mermaid {
+  margin: 1.5rem 0;
+  text-align: center;
+  background: transparent;
+}
+.prose-blog .mermaid svg { max-width: 100%; height: auto; display: inline-block; }
+.prose-blog .mermaid svg,
+.prose-blog img { cursor: zoom-in; }
+
+/* ================================================================
+   Lightbox — 文章图片 / Mermaid 图点击放大查看
+   ================================================================ */
+.lightbox {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out;
+  touch-action: none;
+  user-select: none;
+}
+.lightbox.dragging { cursor: grabbing; }
+.lightbox-stage {
+  transform-origin: center center;
+  will-change: transform;
+  cursor: grab;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-stage img { max-width: 92vw; max-height: 92vh; width: auto; height: auto; border-radius: 0.25rem; }
+.lightbox-close {
+  position: absolute; top: 1rem; right: 1.25rem;
+  width: 2.5rem; height: 2.5rem; border: none; border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12); color: #fff;
+  font-size: 1.5rem; line-height: 1; cursor: pointer;
+}
+.lightbox-close:hover { background: rgba(255, 255, 255, 0.25); }
+.lightbox-hint {
+  position: absolute; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+  padding: 0.35rem 0.9rem; border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.75);
+  font-size: 0.75rem; white-space: nowrap; pointer-events: none;
+}
+
 /* Horizontal rule */
 .prose-blog hr { margin-top: 2rem; margin-bottom: 2rem; border: none; border-top: 1px solid var(--border); }
 
