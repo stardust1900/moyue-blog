@@ -1,7 +1,7 @@
 ---
 title: "隋坡 B站菜谱全集整理（150 道）"
-date: 2026-09-26
-category: "技术笔记"
+date: 2026-10-12
+category: "美食菜谱"
 tags: ["B站","特厨隋坡","菜谱"]
 description: "一份把「特厨隋坡」散落在 B站各处的做菜视频全部攒齐的菜谱索引"
 coverEmoji: "🥢"
