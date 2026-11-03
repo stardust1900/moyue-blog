@@ -60,6 +60,19 @@ const readingTime = estimateReadingTime(post.body);
           {bodyHtml ? <Fragment set:html={bodyHtml} /> : <slot />}
         </article>
 
+        <!-- 文章末尾广告（响应式，移动端自动铺满宽度） -->
+        <div class="mt-10">
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-3202703159392077"
+               data-ad-slot="9669290191"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script is:inline>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+
         <div class="mt-12 pt-8 border-t border-border flex items-center justify-between">
           <a href={withBase('/')} class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <Icon name="arrow-left" size={16} /> 返回首页
